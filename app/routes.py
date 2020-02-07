@@ -10,7 +10,7 @@ from app.models import User
 @login_required
 def index():
 	# Mock data for testing
-	user = {'username': 'SumitY'}
+	user = {'username': 'Sumit'}
 	posts = [
 		{
 			'author': {'username': 'John'},
