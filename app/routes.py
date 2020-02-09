@@ -88,6 +88,9 @@ def register():
 @app.route('/user/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
+	if(username != current_user.username):
+		flash("You don't have access to that page")
+		return redirect(url_for('index'))
 	user = User.query.filter_by(username=username).first_or_404()
 	
 	# Mock data for testing
