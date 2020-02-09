@@ -7,5 +7,4 @@ __pycache__/
 *.py[cod]
 
 # Protect secure data
-.flaskenv
 .env
