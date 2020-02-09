@@ -1,5 +1,7 @@
-from app import db, login
+from app import app, db, login
 from datetime import datetime
+from time import time
+import jwt
 from flask import flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -22,16 +24,39 @@ class User(UserMixin, db.Model):
 	# User DB relationships
 	posts = db.relationship('Post', backref='author', lazy='dynamic')
 
+
 	def __repr__(self):
 		return '<User {}>'.format(self.username)
+
 
 	# Converts plaintext password to hash
 	def set_password(self, password):
 		self.password_hash = generate_password_hash(password)
 
+
 	# Checks input plaintext password against hashed password
 	def check_password(self, password):
 		return check_password_hash(self.password_hash, password)   
+
+
+	# Generates password reset token for given user which is valid for a given duration
+	def get_password_reset_token(self, valid_duration=1800):
+		exp_time = time() + valid_duration
+		return jwt.encode(
+			{
+				'reset_password': self.id,
+				'exp': exp_time
+			}, app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+
+
+	@staticmethod
+	def verify_password_reset_token(token):
+		try:
+			id = jwt.decode(token , app.config['SECRET_KEY'], algorithms=['HS256'])['reset_password']
+		except: return
+
+		return User.query.get(id)
+
 
 
 class Post(db.Model):

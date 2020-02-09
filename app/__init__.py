@@ -13,5 +13,6 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
 mail = Mail(app)
+
 # The 'app' folder
 from app import routes, models, errors
