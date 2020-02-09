@@ -6,5 +6,6 @@ __pycache__/
 */__pycache__/
 *.py[cod]
 
-# Protect email pw
+# Protect secure data
 .flaskenv
+.env
