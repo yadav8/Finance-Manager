@@ -7,7 +7,7 @@
 		<a href="{{ url_for('main.add_account') }}">Add Account</a>
 		<a href="{{ url_for('main.delete_user') }}">Delete Profile</a>
 	</body>
-	{% for transaction in transactions %}
-	<div><p>{{ transaction.user.first_name }} says: <b>{{ transaction.amount }}</b></p></div>
+	{% for account in accounts %}
+	<div><p>{{ account.account_name }}: <b>{{ account.account_networth }}</b></p></div>
 	{% endfor %}
 {% endblock %}

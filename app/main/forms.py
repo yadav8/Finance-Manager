@@ -13,5 +13,5 @@ class AddAccountRequestForm(FlaskForm):
 
 class AddAccountForm(FlaskForm):
 	account_name = StringField('Account Name', validators=[DataRequired()])
-	institution = StringField('institution (Optional)')
-	submit = SubmitField('Register')
+	institution = StringField('Institution (Optional)')
+	submit = SubmitField('Add Account')

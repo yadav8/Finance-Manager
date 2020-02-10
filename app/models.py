@@ -70,7 +70,7 @@ class Account(db.Model):
 	# Account fields
 	account_id		= db.Column(db.Integer, primary_key=True)
 	user_id			= db.Column(db.Integer, db.ForeignKey('user.user_id'))
-	account_name 	= db.Column(db.String(64), unique=True)
+	account_name 	= db.Column(db.String(64))
 	account_networth = db.Column(db.Float, nullable=True, default=0)
 	date_added 		= db.Column(db.DateTime, default=datetime.utcnow)
 	date_modified 	= db.Column(db.DateTime, default=datetime.utcnow)

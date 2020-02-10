@@ -10,6 +10,10 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 
+# Adding a naming convention for our DB so migrations don't
+# introduce errors. This is because SQLite sometimes adds constraints
+# without explicitly naming them, which can cause issues during
+# migrations.
 naming_convention = {
 	"ix": 'ix_%(column_0_label)s',
 	"uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -18,6 +22,8 @@ naming_convention = {
 	"pk": "pk_%(table_name)s"
 }
 
+
+# Initializing objects of various extensions
 db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 migrate = Migrate()
 login = LoginManager()
@@ -35,6 +41,7 @@ def create_app(config_class=Config):
 	mail.init_app(app)
 	bootstrap.init_app(app)
 
+	# Adding blueprints of different modules to our app
 	from app.errors import bp as errors_bp
 	app.register_blueprint(errors_bp)
 
@@ -44,6 +51,8 @@ def create_app(config_class=Config):
 	from app.main import bp as main_bp
 	app.register_blueprint(main_bp)
 
+
+	# File error logging
 	if not app.debug and not app.testing:
 		if not os.path.exists('logs'):
 			os.mkdir('logs')

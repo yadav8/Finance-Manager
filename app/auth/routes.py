@@ -1,5 +1,5 @@
 from app import db
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, session
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from app.models import User
@@ -31,8 +31,8 @@ def login():
 			return redirect(next_page)
 		# Valid login
 		login_user(user, remember=form.remember_me.data)
+		session.permanent = True
 		flash("User {} successfully logged in".format(user.first_name))
-		
 		return redirect(next_page)
 
 	return render_template('auth/login.html', title='Sign in', form = form)
