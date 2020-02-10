@@ -9,3 +9,9 @@ class DeleteProfileForm(FlaskForm):
 
 class AddAccountRequestForm(FlaskForm):
 	add_account = SubmitField('Add new account')
+
+
+class AddAccountForm(FlaskForm):
+	account_name = StringField('Account Name', validators=[DataRequired()])
+	institution = StringField('institution (Optional)')
+	submit = SubmitField('Register')

@@ -20,14 +20,14 @@ def before_request():
 @login_required
 def index():
 	# Mock data for testing
-	user = {'username': 'Sumit'}
+	user = {'first_name': 'Sumit'}
 	transactions = [
 		{
-			'user': {'username': 'test1'},
+			'user': {'first_name': 'test1'},
 			'amount': '$100'
 		},
 		{
-			'user': {'username': 'test1'},
+			'user': {'first_name': 'test1'},
 			'amount': '$200'
 		}
 	]
@@ -35,35 +35,35 @@ def index():
 
 
 
-@bp.route('/user/<username>', methods=['GET', 'POST'])
+@bp.route('/profile', methods=['GET', 'POST'])
 @login_required
-def user(username):
-	if(username != current_user.username):
-		flash("You don't have access to that page")
-		return redirect(url_for('main.index'))
-	user = User.query.filter_by(username=username).first_or_404()
-	
+def profile():
+
 	# Mock data for testing
 	transactions = [
-		{'user': user, 'amount': '$5'},
-		{'user': user, 'amount': '$10'}
+		{'user': current_user, 'amount': '$5'},
+		{'user': current_user, 'amount': '$10'}
 	]
 
-	return render_template('user.html', user=user, transactions=transactions)
+	return render_template('user.html', user=current_user, transactions=transactions)
 
 
 @bp.route('/delete_user')
 @login_required
 def delete_user():
-	username = current_user.username
+	name = current_user.first_name + ' ' + current_user.last_name
 	db.session.delete(current_user)
 	db.session.commit()
-	flash("User {} successfully deleted".format(username))
+	flash("User {} successfully deleted".format(name))
 	return redirect(url_for('auth.login'))
 
 
 @bp.route('/add_account')
 @login_required
 def add_account():
-	flash("Account add pressed")
-	return redirect(url_for('main.user',username=current_user.username))
+	form = AddAccountForm()
+
+	if form.validate_on_submit():
+		flash("yay")
+
+	return redirect(url_for('main.profile'))

@@ -24,14 +24,14 @@ def login():
 
 	# Validating user login
 	if form.validate_on_submit():
-		user = User.query.filter_by(username=form.username.data).first()
+		user = User.query.filter_by(email=form.email.data).first()
 		# Invalid login
 		if not (user and user.check_password(form.password.data)):
-			flash("Invalid username or password")
+			flash("Invalid email or password")
 			return redirect(next_page)
 		# Valid login
 		login_user(user, remember=form.remember_me.data)
-		flash("User {} successfully logged in".format(user.username))
+		flash("User {} successfully logged in".format(user.first_name))
 		
 		return redirect(next_page)
 
@@ -56,12 +56,14 @@ def register():
 	# Validating user registration
 	if form.validate_on_submit():
 		# Add user to db
-		user = User(username=form.username.data, email=form.email.data)
+		first_name = form.first_name.data[0].upper() + form.first_name.data[1:]
+		last_name = form.last_name.data[0].upper() + form.last_name.data[1:]
+		user = User(email=form.email.data, first_name=first_name, last_name=last_name)
 		user.set_password(form.password.data)
 		db.session.add(user)
 		db.session.commit()
 		# Succesfully added new user
-		flash("Congratulations, user {} successfully created".format(user.username))
+		flash("Congratulations {}, profile successfully created".format(user.first_name))
 		return redirect(url_for('auth.login'))
 	
 	return render_template('auth/register.html', title='Register', form = form)

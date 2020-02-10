@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<h1>Hi, {{ current_user.username }}!</h1>
+	<h1>Hi, {{ current_user.first_name }}!</h1>
 	<p><b>Last Active:</b> {{ current_user.last_seen }}</p>
 	<div>
 		<a href="{{ url_for('main.add_account') }}">Add Account</a>
 		<a href="{{ url_for('main.delete_user') }}">Delete Profile</a>
 	</body>
 	{% for transaction in transactions %}
-	<div><p>{{ transaction.user.username }} says: <b>{{ transaction.amount }}</b></p></div>
+	<div><p>{{ transaction.user.first_name }} says: <b>{{ transaction.amount }}</b></p></div>
 	{% endfor %}
 {% endblock %}

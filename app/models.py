@@ -16,7 +16,6 @@ def load_user(user_id):
 class User(UserMixin, db.Model):
 	# Users fields
 	user_id		= db.Column(db.Integer, primary_key=True)
-	username 	= db.Column(db.String(64), index=True, unique=True)
 	first_name 	= db.Column(db.String(32), index=True)
 	last_name 	= db.Column(db.String(32), index=True)
 	email 		= db.Column(db.String(120), index=True, unique=True)
@@ -25,11 +24,12 @@ class User(UserMixin, db.Model):
 	networth 	= db.Column(db.Float, nullable=True, default=0)
 
 	# User relationships
-	accounts = db.relationship('Account', backref='owner', lazy='dynamic')
+	accounts = db.relationship('Account', backref='owner', \
+		cascade='all, delete-orphan', lazy='dynamic')
 
 
 	def __repr__(self):
-		return '<User {}>'.format(self.username)
+		return '<User {} {}>'.format(self.first_name, self.last_name)
 
 
 	def get_id(self):
@@ -70,7 +70,7 @@ class Account(db.Model):
 	# Account fields
 	account_id		= db.Column(db.Integer, primary_key=True)
 	user_id			= db.Column(db.Integer, db.ForeignKey('user.user_id'))
-	account_name 	= db.Column(db.String(64))
+	account_name 	= db.Column(db.String(64), unique=True)
 	account_networth = db.Column(db.Float, nullable=True, default=0)
 	date_added 		= db.Column(db.DateTime, default=datetime.utcnow)
 	date_modified 	= db.Column(db.DateTime, default=datetime.utcnow)
