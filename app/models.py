@@ -9,24 +9,31 @@ from flask_login import UserMixin
 # Creating a user_loader function for the flask_login extension
 # to be able to load a user from our DB
 @login.user_loader
-def load_user(id):
-	return User.query.get(int(id))
+def load_user(user_id):
+	return User.query.get(int(user_id))
 
 
 class User(UserMixin, db.Model):
-	# Users DB fields
-	id = db.Column(db.Integer, primary_key=True)
-	username = db.Column(db.String(64), index=True, unique=True)
-	email = db.Column(db.String(120), index=True, unique=True)
+	# Users fields
+	user_id		= db.Column(db.Integer, primary_key=True)
+	username 	= db.Column(db.String(64), index=True, unique=True)
+	first_name 	= db.Column(db.String(32), index=True)
+	last_name 	= db.Column(db.String(32), index=True)
+	email 		= db.Column(db.String(120), index=True, unique=True)
 	password_hash = db.Column(db.String(128))
-	last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+	last_seen 	= db.Column(db.DateTime, default=datetime.utcnow)
+	networth 	= db.Column(db.Float, nullable=True, default=0)
 
-	# User DB relationships
-	posts = db.relationship('Post', backref='author', lazy='dynamic')
+	# User relationships
+	accounts = db.relationship('Account', backref='owner', lazy='dynamic')
 
 
 	def __repr__(self):
 		return '<User {}>'.format(self.username)
+
+
+	def get_id(self):
+		return self.user_id
 
 
 	# Converts plaintext password to hash
@@ -44,7 +51,7 @@ class User(UserMixin, db.Model):
 		exp_time = time() + valid_duration
 		return jwt.encode(
 			{
-				'reset_password': self.id,
+				'reset_password': self.user_id,
 				'exp': exp_time
 			}, current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
@@ -52,19 +59,23 @@ class User(UserMixin, db.Model):
 	@staticmethod
 	def verify_password_reset_token(token):
 		try:
-			id = jwt.decode(token , current_app.config['SECRET_KEY'], algorithms=['HS256'])['reset_password']
+			user_id = jwt.decode(token , current_app.config['SECRET_KEY'], algorithms=['HS256'])['reset_password']
 		except: return
 
-		return User.query.get(id)
+		return User.query.get(user_id)
 
 
 
-class Post(db.Model):
-	# Posts DB fields
-	id = db.Column(db.Integer, primary_key=True)
-	body = db.Column(db.String(140))
-	timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+class Account(db.Model):
+	# Account fields
+	account_id		= db.Column(db.Integer, primary_key=True)
+	user_id			= db.Column(db.Integer, db.ForeignKey('user.user_id'))
+	account_name 	= db.Column(db.String(64))
+	account_networth = db.Column(db.Float, nullable=True, default=0)
+	date_added 		= db.Column(db.DateTime, default=datetime.utcnow)
+	date_modified 	= db.Column(db.DateTime, default=datetime.utcnow)
+	institution 	= db.Column(db.String(64), nullable=True)
+
 
 	def __repr__(self):
-		return '<Post {}>'.format(self.body)
+		return '<Account {}>'.format(self.account_name)

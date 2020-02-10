@@ -5,3 +5,7 @@ from app.models import User
 
 class DeleteProfileForm(FlaskForm):
 	delete = SubmitField('Delete Profile')
+
+
+class AddAccountRequestForm(FlaskForm):
+	add_account = SubmitField('Add new account')

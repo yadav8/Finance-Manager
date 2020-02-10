@@ -2,13 +2,12 @@
 
 {% block content %}
 	<h1>Hi, {{ current_user.username }}!</h1>
-	{% for post in posts %}
-	<div><p>{{ post.author.username }} says: <b>{{ post.body }}</b></p></div>
-	{% endfor %}
-	<form action="" method="post" novalidate>
-		{{ form.hidden_tag() }}
-		<p>
-			{{ form.delete() }}<br>
-		</p>
+	<p><b>Last Active:</b> {{ current_user.last_seen }}</p>
+	<div>
+		<a href="{{ url_for('main.add_account') }}">Add Account</a>
+		<a href="{{ url_for('main.delete_user') }}">Delete Profile</a>
 	</body>
+	{% for transaction in transactions %}
+	<div><p>{{ transaction.user.username }} says: <b>{{ transaction.amount }}</b></p></div>
+	{% endfor %}
 {% endblock %}

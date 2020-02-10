@@ -8,3 +8,7 @@ __pycache__/
 
 # Protect secure data
 .env
+*.db
+
+# Logs
+logs/
