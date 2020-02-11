@@ -17,3 +17,10 @@ class AddAccountForm(FlaskForm):
 	institution = StringField('Institution (Optional)')
 	account_networth = DecimalField('Account Net Worth (USD)', places=2)
 	submit = SubmitField('Add Account')
+
+
+class AddTransactionForm(FlaskForm):
+	transaction_name = StringField('Transaction Name', validators=[DataRequired()])
+	amount = DecimalField('Amount (USD)', places=2)
+	#recurring = 
+	submit = SubmitField('Add Account')

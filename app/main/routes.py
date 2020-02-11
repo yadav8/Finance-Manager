@@ -6,7 +6,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from app.main import bp
 from app.main.forms import *
-from app.models import User, Account
+from app.models import User, Account, Transaction
 
 # Records last seen for a user, and resets their inactivity timer
 @bp.before_app_request
@@ -20,18 +20,7 @@ def before_request():
 @bp.route('/index')
 @login_required
 def index():
-	# Mock data for testing
-	transactions = [
-		{
-			'user': {'first_name': current_user.first_name},
-			'amount': '$100'
-		},
-		{
-			'user': {'first_name': current_user.first_name},
-			'amount': '$200'
-		}
-	]
-	return render_template('index.html', title='Home Page', transactions=transactions)
+	return redirect(url_for('main.profile'))
 
 
 # Profile landing page
@@ -42,10 +31,10 @@ def profile():
 	# Currently just showing accounts. Eventually want to show x number of
 	# total latest transactions for the usuer
 	accounts = current_user.accounts.all()
+	# Recalculates total networth everytime profile loads
 	current_user.networth = current_user.get_networth()
 	db.session.commit()
-	
-	flash(current_user.networth)
+
 
 	return render_template('user.html', user=current_user, accounts=accounts)
 
@@ -75,7 +64,7 @@ def add_account():
 		if not account_name_rejected:
 			new_account = Account(account_name=form.account_name.data, \
 				user_id=current_user.user_id, institution=form.institution.data, \
-				account_networth=form.account_networth)
+				account_networth=form.account_networth.data)
 			db.session.add(new_account)
 			db.session.commit()
 			flash("Account {} succesfully added to profile".format(new_account.account_name))
@@ -85,11 +74,29 @@ def add_account():
 
 
 
-#@bp.route('/delete_account', methods=['GET', 'POST'])
-
 @bp.route('/account/<account_id>')
 @login_required
 def account(account_id):
 	account = Account.query.get(account_id)
-	flash("{} clicked".format(account.account_name))
+	return render_template('account.html', account=account)
+
+
+
+@bp.route('/delete_account/<account_id>', methods=['GET', 'POST'])
+@login_required
+def delete_account(account_id):
+	account = Account.query.get(account_id)
+	db.session.delete(account)
+	db.session.commit()
 	return redirect(url_for('main.profile'))
+
+
+
+@bp.route('/add_transaction/<account_id>')
+@login_required
+def add_transaction(account_id):
+	account = Account.query.get(account_id)
+	#return render_template('account.html', account=account)
+	return redirect(url_for('main.profile'))
+
+
