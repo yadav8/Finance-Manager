@@ -21,7 +21,7 @@ class User(UserMixin, db.Model):
 	email 		= db.Column(db.String(120), index=True, unique=True)
 	password_hash = db.Column(db.String(128))
 	last_seen 	= db.Column(db.DateTime, default=datetime.utcnow)
-	networth 	= db.Column(db.Float, nullable=True, default=0)
+	networth 	= db.Column(db.Float(precision=2), nullable=True, default=0)
 
 	# User relationships
 	accounts = db.relationship('Account', backref='owner', \
@@ -56,6 +56,13 @@ class User(UserMixin, db.Model):
 			}, current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
 
+	def get_networth(self):
+		networth = 0
+		for account in self.accounts.all():
+			networth = networth + account.account_networth
+		return networth
+
+
 	@staticmethod
 	def verify_password_reset_token(token):
 		try:
@@ -71,7 +78,7 @@ class Account(db.Model):
 	account_id		= db.Column(db.Integer, primary_key=True)
 	user_id			= db.Column(db.Integer, db.ForeignKey('user.user_id'))
 	account_name 	= db.Column(db.String(64))
-	account_networth = db.Column(db.Float, nullable=True, default=0)
+	account_networth = db.Column(db.Float(precision=2), nullable=True, default=0)
 	date_added 		= db.Column(db.DateTime, default=datetime.utcnow)
 	date_modified 	= db.Column(db.DateTime, default=datetime.utcnow)
 	institution 	= db.Column(db.String(64), nullable=True)

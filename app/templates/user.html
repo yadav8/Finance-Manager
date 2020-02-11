@@ -1,13 +1,30 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<h1>Hi, {{ current_user.first_name }}!</h1>
-	<p><b>Last Active:</b> {{ current_user.last_seen }}</p>
+	<h1>Hi, {{ user.first_name }}!</h1>
+	<p><b>Profile Networth: </b>USD {{ user.networth }}</p>
 	<div>
 		<a href="{{ url_for('main.add_account') }}">Add Account</a>
 		<a href="{{ url_for('main.delete_user') }}">Delete Profile</a>
-	</body>
-	{% for account in accounts %}
-	<div><p>{{ account.account_name }}: <b>{{ account.account_networth }}</b></p></div>
-	{% endfor %}
+	</div><br>
+	{% if accounts != [] %}
+		<style>
+			table, th, td {
+		  		border: 1px solid black;
+		  		border-collapse: collapse;
+			}
+		</style>
+		<table style="width:50%">
+			<tr>
+				<th>Account Name</th>
+				<th>Networth</th>
+				<th>Institution</th>
+			{% for account in accounts %}
+				<tr>
+					<td><a href="{{ url_for('main.account', account_id=account.account_id) }}">{{ account.account_name }}</a></td>
+					<td>USD {{ account.account_networth }}</td>
+					<td>{{ account.institution }}</td>
+				</tr>
+			{% endfor %}
+	{% endif %}
 {% endblock %}

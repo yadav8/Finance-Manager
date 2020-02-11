@@ -18,6 +18,13 @@
             <span style="color: red">[{{ error }}]</span>
             {% endfor %}
         </p>
+        <p>
+            {{ form.account_networth.label }}<br>
+            {{ form.account_networth(size=32) }}<br>
+            {% for error in form.account_networth.errors %}
+            <span style="color: red">[{{ error }}]</span>
+            {% endfor %}
+        </p>
         <p>{{ form.submit() }}</p>
     </form>
 {% endblock %}

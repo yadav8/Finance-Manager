@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, \
+	SubmitField, DecimalField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 from app.models import User
 
@@ -14,4 +15,5 @@ class AddAccountRequestForm(FlaskForm):
 class AddAccountForm(FlaskForm):
 	account_name = StringField('Account Name', validators=[DataRequired()])
 	institution = StringField('Institution (Optional)')
+	account_networth = DecimalField('Account Net Worth (USD)', places=2)
 	submit = SubmitField('Add Account')
