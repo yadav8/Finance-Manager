@@ -3,6 +3,6 @@
 {% block content %}
     <h1>Hi, {{ current_user.first_name }}!</h1>
     {% for transaction in transactions %}
-    	{% include '_transaction.html' %}
+    	{% include 'main/_transaction.html' %}
     {% endfor %}
 {% endblock %}

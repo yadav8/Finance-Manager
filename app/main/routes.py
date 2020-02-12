@@ -7,6 +7,7 @@ from werkzeug.urls import url_parse
 from app.main import bp
 from app.main.forms import *
 from app.models import User, Account, Transaction
+import decimal
 
 # Records last seen for a user, and resets their inactivity timer
 @bp.before_app_request
@@ -31,12 +32,21 @@ def profile():
 	# Currently just showing accounts. Eventually want to show x number of
 	# total latest transactions for the usuer
 	accounts = current_user.accounts.all()
+
 	# Recalculates total networth everytime profile loads
 	current_user.networth = current_user.get_networth()
 	db.session.commit()
 
+	transactions = get_transaction_account_array(current_user)	
 
-	return render_template('user.html', user=current_user, accounts=accounts)
+	return render_template('main/user.html', user=current_user, accounts=accounts, transactions=transactions)
+
+def get_transaction_account_array(user):	
+	trans_with_accounts = []
+	for transaction in user.transaction_history.order_by(Transaction.timestamp.desc()):
+		account = Account.query.get(transaction.account_id)
+		trans_with_accounts.append({'t': transaction, 'account_name': account.account_name})
+	return trans_with_accounts
 
 
 @bp.route('/delete_user', methods=['GET', 'POST'])
@@ -70,7 +80,7 @@ def add_account():
 			flash("Account {} succesfully added to profile".format(new_account.account_name))
 			return redirect(url_for('main.profile'))
 
-	return render_template('add_account.html', form=form)
+	return render_template('main/add_account.html', form=form)
 
 
 
@@ -78,7 +88,8 @@ def add_account():
 @login_required
 def account(account_id):
 	account = Account.query.get(account_id)
-	return render_template('account.html', account=account)
+	transactions = account.transaction_history.order_by(Transaction.timestamp.desc())
+	return render_template('main/account.html', account=account, transactions=transactions)
 
 
 
@@ -92,11 +103,37 @@ def delete_account(account_id):
 
 
 
-@bp.route('/add_transaction/<account_id>')
+@bp.route('/add_transaction/<account_id>', methods=['GET', 'POST'])
 @login_required
 def add_transaction(account_id):
 	account = Account.query.get(account_id)
-	#return render_template('account.html', account=account)
-	return redirect(url_for('main.profile'))
+	form = AddTransactionForm()
+
+	if form.validate_on_submit():
+		if form.transaction_type.data=='Expense':
+			amount = decimal.Decimal(0.00) - form.amount.data
+		elif form.transaction_type.data=='Income':
+			amount = form.amount.data
+
+		tr = Transaction(transaction_name=form.transaction_name.data, \
+			user_id=current_user.user_id, account_id=account_id, \
+			amount=amount, note=form.note.data)
+		if form.recurring.data=='True':
+			tr.recurring = True
+			tr.recurring_delay = Transaction.set_recurring_delay(form.how_often.data)
+			tr.recurring_enddate = Transaction.set_recurring_enddate(form.enddate.data)
+		
+		account.account_networth += amount
+
+		db.session.add(tr)
+		db.session.commit()
+		flash("{} succesfully added".format(tr))
+		return redirect(url_for('main.account', account_id=account_id))
+
+
+	return render_template('main/add_transaction.html', form=form)
+
+
+#@bp.route('/add_transaction')
 
 

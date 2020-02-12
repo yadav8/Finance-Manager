@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<br style="line-height:0.5">
+	<h1 style="line-height:0.5">{{ account.account_name }}</h1>
+	<h3 style="line-height:0.5">{{ account.institution }}</h3>
+	<br style="line-height:0.5">
+	<p><b>Account Networth: </b>USD {{ account.account_networth }}</p>
+	<div>
+		<a href="{{ url_for('main.add_transaction', account_id=account.account_id) }}">Add Transaction</a>
+		<a href="{{ url_for('main.delete_account', account_id=account.account_id) }}">Delete Account</a>
+	</div><br>
+	<style>
+		table, th, td {
+	  		border: 0.25px solid black;
+	  		border-collapse: collapse;
+		}
+		th, td {
+		  padding: 5px;
+		  text-align: left;
+		}
+		tr:nth-child(even) {
+		  background-color: #eee;
+		}
+		tr:nth-child(odd) {
+		 background-color: #fff;
+		}
+	</style>
+	{% if transactions.count() > 0 %}
+		<table style="width:50%">
+			<tr>
+				<th>Date Added</th>
+				<th>Transaction Name</th>
+				<th>Amount</th>
+				<th>Notes</th>
+			</tr>
+			{% for transaction in transactions %}
+				<tr>
+					{% include 'main/_transaction.html' %}
+				</tr>
+			{% endfor %}
+		</table>
+	{% endif %}
+{% endblock %}

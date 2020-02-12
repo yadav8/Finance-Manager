@@ -60,6 +60,7 @@ def register():
 		last_name = form.last_name.data[0].upper() + form.last_name.data[1:]
 		user = User(email=form.email.data, first_name=first_name, last_name=last_name)
 		user.set_password(form.password.data)
+		categories = Categories.load_initial_categories()
 		db.session.add(user)
 		db.session.commit()
 		# Succesfully added new user

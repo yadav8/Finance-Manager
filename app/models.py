@@ -1,8 +1,8 @@
 from app import db, login
-from datetime import datetime
+from datetime import datetime, timedelta, time
 from time import time
 import jwt
-from flask import current_app
+from flask import current_app, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
@@ -26,6 +26,10 @@ class User(UserMixin, db.Model):
 	# User relationships
 	accounts = db.relationship('Account', backref='owner', \
 		cascade='all, delete-orphan', lazy='dynamic')
+	transaction_history = db.relationship('Transaction', backref='owner', \
+	 	cascade='all, delete-orphan', lazy='dynamic')
+	categories = db.relationship('Category', backref='owner', \
+	 	cascade='all, delete-orphan', lazy='dynamic')
 
 
 	def __repr__(self):
@@ -83,37 +87,65 @@ class Account(db.Model):
 	date_modified 	= db.Column(db.DateTime, default=datetime.utcnow)
 	institution 	= db.Column(db.String(64), nullable=True)
 
-	# User relationships
-	transaction_history = db.relationship('Transaction', backref='account_from', \
-		cascade='all, delete-orphan', lazy='dynamic')
+	# Account relationships
+	transaction_history = db.relationship('Transaction', backref='account', \
+	 	cascade='all, delete-orphan', lazy='dynamic')
 	
 
 	def __repr__(self):
-		return '<Account {} {}>'.format(self.account_id, self.account_name)
+		if self.institution:
+			return '<Account {} {}>'.format(self.institution, self.account_name)
+		else:
+			return '<Account {}>'.format(self.account_name)
 
 
 class Transaction(db.Model):
 	# Transaction fields
 	transaction_id	= db.Column(db.Integer, primary_key=True)
 	user_id			= db.Column(db.Integer, db.ForeignKey('user.user_id'))
-	account_from_id	= db.Column(db.Integer, db.ForeignKey('account.account_id'))
-	account_to_id	= db.Column(db.Integer, db.ForeignKey('account.account_id'), nullable=True)
+	account_id		= db.Column(db.Integer, db.ForeignKey('account.account_id'))
+	category_id 	= db.Column(db.Integer, db.ForeignKey('category.category_id'))
 	transaction_name = db.Column(db.String(40))
 	amount			= db.Column(db.Numeric(scale=2))
 	timestamp		= db.Column(db.DateTime, default=datetime.utcnow)
 	recurring		= db.Column(db.Boolean, default=False)
 	recurring_delay = db.Column(db.Interval, nullable=True, default=None)
+	recurring_enddate = db.Column(db.DateTime, nullable=True)
 	note 			= db.Column(db.String(120), nullable=True)
 	delete_allowed	= db.Column(db.Boolean, default=True)
 
 	def __repr__(self):
-		if self.transaction_name:
-			return '<Account {} {}>'.format(self.transaction_id, self.transaction_name)
-		else:
-			return '<Account {}>'.format(self.transaction_id)
+		return '<Transaction {} {}>'.format(self.transaction_name, self.amount)
+
+	@staticmethod
+	def set_recurring_delay(how_often):
+		if how_often == 'Weekly':
+			return timedelta(weeks=1)
+		elif how_often == 'Monthly':
+			return timedelta(days=30)
+		elif how_often == 'Yearly':
+			return timedelta(days=365)
+
+	@staticmethod
+	def set_recurring_enddate(date):
+		t = datetime.min.time()
+		return datetime.combine(date, t)
+
+class Category(db.Model):
+	# Category fields
+	category_id 		= db.Column(db.Integer, primary_key=True)
+	user_id 			= db.Column(db.Integer, db.ForeignKey('user.user_id'))
+	parent_category_id	= db.Column(db.Integer, db.ForeignKey('category.category_id'), nullable=True)
+	category_name 		= db.Column(db.String(40))
+	user_deleted 		= db.Column(db.Boolean, default=False)
+
+	# Account relationships
+	transactions = db.relationship('Transaction', backref='category', lazy='dynamic')
+
+	def __repr__(self):
+		return '<Category {}>'.format(self.category_name)
 
 
-# class Category(db.Model):
-# 	# Category fields
-# 	category_id = db.Column(db.Integer, primary_key=True)
-
+	@staticmethod
+	def load_initial_categories():
+		return None

@@ -9,8 +9,12 @@
 	</div><br>
 	{% if accounts != [] %}
 		<style>
-			table, th, td {
+			table#accounts_table table, th, td {
 		  		border: 1px solid black;
+		  		border-collapse: collapse;
+			}
+			table, th, td {
+		  		border: 0.25px solid black;
 		  		border-collapse: collapse;
 			}
 			th, td {
@@ -23,15 +27,16 @@
 			tr:nth-child(odd) {
 			 background-color: #fff;
 			}
-			th {
+			table#accounts_table th {
 			  background-color: black;
 			  color: white;
 			}
 		</style>
-		<table style="width:40%">
+		<table id="accounts_table" style="width:40%">
 			<tr>
 				<th>Account Name</th>
 				<th>Networth</th>
+			</tr>
 			{% for account in accounts %}
 				<tr>
 					<td>
@@ -39,5 +44,26 @@
 					<td>USD {{ account.account_networth }}</td>
 				</tr>
 			{% endfor %}
+		</table><br>
+		{% if transactions|length > 0 %}
+			<table style="width:50%">
+				<tr>
+					<th>Date Added</th>
+					<th>Account</th>
+					<th>Transaction Name</th>
+					<th>Amount</th>
+					<th>Notes</th>
+				</tr>
+				{% for transaction in transactions %}
+					<tr>
+						<td>{{ transaction.t.timestamp.ctime() }}</td>
+						<td> {{ transaction.account_name }} </td>
+						<td>{{ transaction.t.transaction_name }}</td>
+						<td>USD {{ transaction.t.amount }}</td>
+						<td>{{ transaction.t.note }}</td>
+					</tr>
+				{% endfor %}
+			</table>
+		{% endif %}
 	{% endif %}
 {% endblock %}

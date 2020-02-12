@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1>Add Transaction</h1>
+	<style>
+		p + ul {
+		    margin-top: -10px;
+		    margin-bottom: -10px;
+		}
+		label + select {
+			display: inline;
+			margin-left: 10px;
+		}
+	</style>
+	<form action="" method="post" novalidate>
+		{{ form.hidden_tag() }}
+		<p>
+			{{ form.transaction_name.label }}<br>
+			{{ form.transaction_name(size=32) }}<br>
+			{% for error in form.transaction_name.errors %}
+			<span style="color: red">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		<p>
+			{{ form.transaction_type.label }}<br>
+			{{ form.transaction_type(size=32) }}<br>
+			{% for error in form.transaction_type.errors %}
+			<span style="color: red">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		<p>
+			{{ form.amount.label }}<br>
+			{{ form.amount(size=32) }}<br>
+			{% for error in form.amount.errors %}
+			<span style="color: red">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		<p>
+			{{ form.recurring.label }}
+			{{ form.recurring }}<br>
+			{% for error in form.recurring.errors %}
+			<span style="color: red">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		<p>
+		    {{ form.how_often.label }}
+		    {{ form.how_often }}<br>
+		    {% for error in form.how_often.errors %}
+		    <span style="color: red">[{{ error }}]</span>
+		    {% endfor %}
+		</p>
+		<p>
+		    {{ form.enddate.label }}<br>
+		    {{ form.enddate(size=32) }}<br>
+		    {% for error in form.enddate.errors %}
+		    <span style="color: red">[{{ error }}]</span>
+		    {% endfor %}
+		</p>
+		<p>
+		    {{ form.note.label }}<br>
+		    {{ form.note(size=32) }}<br>
+		    {% for error in form.note.errors %}
+		    <span style="color: red">[{{ error }}]</span>
+		    {% endfor %}
+		</p>
+		<p>{{ form.submit() }}</p>
+	</form>
+	</script>
+{% endblock %}
