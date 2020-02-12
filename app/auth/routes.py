@@ -2,7 +2,7 @@ from app import db
 from flask import render_template, flash, redirect, url_for, request, session
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
-from app.models import User
+from app.models import User, Category
 from app.auth import bp
 from app.auth.forms import *
 from app.auth.email import send_password_request_email
@@ -60,8 +60,15 @@ def register():
 		last_name = form.last_name.data[0].upper() + form.last_name.data[1:]
 		user = User(email=form.email.data, first_name=first_name, last_name=last_name)
 		user.set_password(form.password.data)
-		categories = Categories.load_initial_categories()
 		db.session.add(user)
+		db.session.commit()
+		
+		# Loading default categories
+		category_names = Category.load_initial_categories()
+		for category_name in category_names:
+			category = Category(user_id=user.user_id, category_name=category_name)
+			db.session.add(category)
+		
 		db.session.commit()
 		# Succesfully added new user
 		flash("Congratulations {}, profile successfully created".format(user.first_name))

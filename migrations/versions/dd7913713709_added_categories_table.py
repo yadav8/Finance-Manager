@@ -1,8 +1,8 @@
-"""added categories table
+"""Added categories table
 
-Revision ID: d0847e1fb3be
+Revision ID: dd7913713709
 Revises: 114e6b9ab465
-Create Date: 2020-02-11 19:31:46.883393
+Create Date: 2020-02-11 22:42:54.358243
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd0847e1fb3be'
+revision = 'dd7913713709'
 down_revision = '114e6b9ab465'
 branch_labels = None
 depends_on = None

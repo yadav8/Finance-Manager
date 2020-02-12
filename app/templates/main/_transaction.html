@@ -1,4 +1,24 @@
-<td>{{ transaction.timestamp.ctime() }}</td>
-<td>{{ transaction.transaction_name }}</td>
-<td>USD {{ transaction.amount }}</td>
-<td>{{ transaction.note }}</td>
+<table style="width:70%">
+	<tr>
+		<th>Date Added</th>
+		{%if transactions[0]|length > 2 %}
+		<th>Account</th>
+		{% endif %}
+		<th>Category</th>
+		<th>Transaction Name</th>
+		<th>Amount</th>
+		<th>Notes</th>
+	</tr>
+	{% for transaction in transactions %}
+		<tr>
+			<td>{{ transaction.t.timestamp.ctime() }}</td>
+			<td>{{ transaction.category_name }}</td>
+			{%if transactions[0]|length > 2 %}
+			<td>{{ transaction.account_name }} </td>
+			{% endif %}
+			<td>{{ transaction.t.transaction_name }}</td>
+			<td>USD {{ transaction.t.amount }}</td>
+			<td>{{ transaction.t.note }}</td>
+		</tr>
+	{% endfor %}
+</table>

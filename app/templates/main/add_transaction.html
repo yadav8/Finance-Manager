@@ -29,6 +29,13 @@
 			{% endfor %}
 		</p>
 		<p>
+		    {{ form.category.label }}
+		    {{ form.category }}<br>
+		    {% for error in form.category.errors %}
+		    <span style="color: red">[{{ error }}]</span>
+		    {% endfor %}
+		</p>
+		<p>
 			{{ form.amount.label }}<br>
 			{{ form.amount(size=32) }}<br>
 			{% for error in form.amount.errors %}
@@ -65,5 +72,4 @@
 		</p>
 		<p>{{ form.submit() }}</p>
 	</form>
-	</script>
 {% endblock %}

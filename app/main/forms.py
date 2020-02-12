@@ -24,10 +24,11 @@ class AddTransactionForm(FlaskForm):
 	transaction_name = StringField('Transaction Name', validators=[DataRequired()])
 	transaction_type = RadioField('Transaction Type', \
 		choices=[('Income','Income'), ('Expense','Expense')], default='Expense')
+	category = SelectField('Category:', choices=[], coerce=int)
 	amount = DecimalField('Amount (USD)', places=2)
 	recurring = RadioField('One-Time Transaction?', \
 		choices=[('False','Yes'), ('True','No')], default='False')
-	how_often = SelectField('Repeats', \
+	how_often = SelectField('Repeats:', \
 		choices=[('Weekly','Weekly'), ('Monthly','Monthly'), ('Yearly','Yearly')])
 	enddate = DateField('Recurring End (YYYY-MM-DD)', default=datetime.utcnow)
 	note = StringField('Notes (Optional)')

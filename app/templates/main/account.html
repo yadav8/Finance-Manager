@@ -26,19 +26,7 @@
 		 background-color: #fff;
 		}
 	</style>
-	{% if transactions.count() > 0 %}
-		<table style="width:50%">
-			<tr>
-				<th>Date Added</th>
-				<th>Transaction Name</th>
-				<th>Amount</th>
-				<th>Notes</th>
-			</tr>
-			{% for transaction in transactions %}
-				<tr>
-					{% include 'main/_transaction.html' %}
-				</tr>
-			{% endfor %}
-		</table>
+	{% if transactions|length > 0 %}
+		{% include 'main/_transaction.html' %}
 	{% endif %}
 {% endblock %}

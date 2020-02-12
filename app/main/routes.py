@@ -6,7 +6,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from app.main import bp
 from app.main.forms import *
-from app.models import User, Account, Transaction
+from app.models import User, Account, Transaction, Category
 import decimal
 
 # Records last seen for a user, and resets their inactivity timer
@@ -37,16 +37,28 @@ def profile():
 	current_user.networth = current_user.get_networth()
 	db.session.commit()
 
-	transactions = get_transaction_account_array(current_user)	
+	transactions = build_transaction_array(user=current_user)	
 
 	return render_template('main/user.html', user=current_user, accounts=accounts, transactions=transactions)
 
-def get_transaction_account_array(user):	
-	trans_with_accounts = []
-	for transaction in user.transaction_history.order_by(Transaction.timestamp.desc()):
-		account = Account.query.get(transaction.account_id)
-		trans_with_accounts.append({'t': transaction, 'account_name': account.account_name})
-	return trans_with_accounts
+def build_transaction_array(account=None, user=None):	
+	transaction_array = []
+	if user:
+		for transaction in user.transaction_history.order_by(Transaction.timestamp.desc()).all():
+			category = Category.query.get(transaction.category_id)
+			account = Account.query.get(transaction.account_id)
+			if account.institution:
+				account_name = account.institution+' - '+account.account_name
+			else:
+				account_name = account.account_name
+			transaction_array.append({'t': transaction, 'account_name': account_name, 'category_name': category.category_name})
+		return transaction_array
+
+	if account:		
+		for transaction in account.transaction_history.order_by(Transaction.timestamp.desc()).all():
+			category = Category.query.get(transaction.category_id)
+			transaction_array.append({'t': transaction, 'category_name': category.category_name})
+		return transaction_array
 
 
 @bp.route('/delete_user', methods=['GET', 'POST'])
@@ -88,7 +100,8 @@ def add_account():
 @login_required
 def account(account_id):
 	account = Account.query.get(account_id)
-	transactions = account.transaction_history.order_by(Transaction.timestamp.desc())
+	transactions = account.transaction_history.order_by(Transaction.timestamp.desc()).all()
+	transactions = build_transaction_array(account=account)
 	return render_template('main/account.html', account=account, transactions=transactions)
 
 
@@ -108,6 +121,7 @@ def delete_account(account_id):
 def add_transaction(account_id):
 	account = Account.query.get(account_id)
 	form = AddTransactionForm()
+	form.category.choices = build_user_category_array(current_user)
 
 	if form.validate_on_submit():
 		if form.transaction_type.data=='Expense':
@@ -117,7 +131,7 @@ def add_transaction(account_id):
 
 		tr = Transaction(transaction_name=form.transaction_name.data, \
 			user_id=current_user.user_id, account_id=account_id, \
-			amount=amount, note=form.note.data)
+			amount=amount, note=form.note.data, category_id=int(form.category.data))
 		if form.recurring.data=='True':
 			tr.recurring = True
 			tr.recurring_delay = Transaction.set_recurring_delay(form.how_often.data)
@@ -131,7 +145,16 @@ def add_transaction(account_id):
 		return redirect(url_for('main.account', account_id=account_id))
 
 
-	return render_template('main/add_transaction.html', form=form)
+	return render_template('main/add_transaction.html', form=form, user_id=current_user.user_id)
+
+
+def build_user_category_array(user):
+	categories = user.categories.order_by(Category.category_name).all()
+	choices = []
+	for category in categories:
+		choice = (category.category_id, category.category_name)
+		choices.append(choice)
+	return choices
 
 
 #@bp.route('/add_transaction')

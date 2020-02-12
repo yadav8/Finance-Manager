@@ -85,7 +85,7 @@ class Account(db.Model):
 	account_networth = db.Column(db.Numeric(scale=2), nullable=True, default=0)
 	date_added 		= db.Column(db.DateTime, default=datetime.utcnow)
 	date_modified 	= db.Column(db.DateTime, default=datetime.utcnow)
-	institution 	= db.Column(db.String(64), nullable=True)
+	institution 	= db.Column(db.String(64), nullable=True, default=None)
 
 	# Account relationships
 	transaction_history = db.relationship('Transaction', backref='account', \
@@ -110,8 +110,8 @@ class Transaction(db.Model):
 	timestamp		= db.Column(db.DateTime, default=datetime.utcnow)
 	recurring		= db.Column(db.Boolean, default=False)
 	recurring_delay = db.Column(db.Interval, nullable=True, default=None)
-	recurring_enddate = db.Column(db.DateTime, nullable=True)
-	note 			= db.Column(db.String(120), nullable=True)
+	recurring_enddate = db.Column(db.DateTime, nullable=True, default=None)
+	note 			= db.Column(db.String(120), nullable=True, default=None)
 	delete_allowed	= db.Column(db.Boolean, default=True)
 
 	def __repr__(self):
@@ -135,7 +135,7 @@ class Category(db.Model):
 	# Category fields
 	category_id 		= db.Column(db.Integer, primary_key=True)
 	user_id 			= db.Column(db.Integer, db.ForeignKey('user.user_id'))
-	parent_category_id	= db.Column(db.Integer, db.ForeignKey('category.category_id'), nullable=True)
+	parent_category_id	= db.Column(db.Integer, db.ForeignKey('category.category_id'), nullable=True, default=None)
 	category_name 		= db.Column(db.String(40))
 	user_deleted 		= db.Column(db.Boolean, default=False)
 
@@ -148,4 +148,7 @@ class Category(db.Model):
 
 	@staticmethod
 	def load_initial_categories():
-		return None
+		category_list = ["Rent", "Restaurants", "Groceries", "Auto", "Miscellaneous", \
+			"Loan", "Clothing", "Hobbies", "Sporting Goods", "Books", "Electronics", \
+			"Charity", "Gift", "Medical", "Home Improvement", "Kids"]
+		return category_list

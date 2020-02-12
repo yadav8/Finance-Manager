@@ -1,8 +1,4 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Hi, {{ current_user.first_name }}!</h1>
-    {% for transaction in transactions %}
-    	{% include 'main/_transaction.html' %}
-    {% endfor %}
 {% endblock %}
