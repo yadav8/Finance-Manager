@@ -16,8 +16,11 @@ The database is comprised of 4 tables - `User`, `Account`, `Transaction` and `Ca
 
 The application was built in an incremental fashion - by adding one table at a time, with various unit tests performed at each step to ensure continued functionality. It makes use of `alembic` database migrations, which provides great support in incrementally building up different models in a database and allowing seamless transitions as the tables get modified.
 
->Some other pictures:
+> Account page:
 
+![](pics/account_overview.PNG)
+
+> Some other pictures:
 
 ![](pics/add_transaction50.png)   ![](pics/login_page50.png)
 
