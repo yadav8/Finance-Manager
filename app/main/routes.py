@@ -41,6 +41,7 @@ def profile():
 
 	return render_template('main/user.html', user=current_user, accounts=accounts, transactions=transactions)
 
+# Builds a JSON array with all elements that the client would need to display transactions
 def build_transaction_array(account=None, user=None):	
 	transaction_array = []
 	if user:
@@ -60,7 +61,7 @@ def build_transaction_array(account=None, user=None):
 			transaction_array.append({'t': transaction, 'category_name': category.category_name})
 		return transaction_array
 
-
+# Delete current user
 @bp.route('/delete_user', methods=['GET', 'POST'])
 @login_required
 def delete_user():
@@ -95,7 +96,7 @@ def add_account():
 	return render_template('main/add_account.html', form=form)
 
 
-
+# Displays account overview
 @bp.route('/account/<account_id>')
 @login_required
 def account(account_id):
@@ -105,7 +106,7 @@ def account(account_id):
 	return render_template('main/account.html', account=account, transactions=transactions)
 
 
-
+# Delete account from user profile
 @bp.route('/delete_account/<account_id>', methods=['GET', 'POST'])
 @login_required
 def delete_account(account_id):
@@ -115,7 +116,7 @@ def delete_account(account_id):
 	return redirect(url_for('main.profile'))
 
 
-
+# Add a transaction to a given amount
 @bp.route('/add_transaction/<account_id>', methods=['GET', 'POST'])
 @login_required
 def add_transaction(account_id):
